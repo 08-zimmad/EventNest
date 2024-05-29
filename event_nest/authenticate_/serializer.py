@@ -1,27 +1,23 @@
 from rest_framework import serializers
 from .models import Organizer
-from django.contrib.auth import get_user_model
 
-
-Organizer = get_user_model()
-
-class OrganizerLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
-
-
-
-class OrganizerSignupSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
+class OrganizerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organizer
-        fields = [ 'email','password']
+        fields = [ 'name','email', 'password', 'is_active', 'is_staff','organization']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'is_active': {'read_only': True},
+            'is_staff': {'read_only': True},
+        }
 
+
+# used for creating data instances in model
     def create(self, validated_data):
         user = Organizer.objects.create_user(
+            name=validated_data['name'],
             email=validated_data['email'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            organization=validated_data['organization']
         )
         return user
