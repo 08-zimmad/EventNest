@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import OrganizerLogin, SignUpView
+from .views import OrganizerRegisterView, OrganizerLoginView
 
 urlpatterns = [
-    path("token/",OrganizerLogin.as_view()),
-    path('signup/', SignUpView.as_view(), name='signup')
+    path('api/organizer/register/', OrganizerRegisterView.as_view(), name='organizer_register'),
+    path('api/organizer/login/', OrganizerLoginView.as_view(), name='organizer_login'),
+    # Other URLs...
 ]
-
