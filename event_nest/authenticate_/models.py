@@ -4,21 +4,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.conf import settings
 
 
-class Events(models.Model):
-    title=models.CharField(max_length=40)
-    description=models.TextField()
-    date=models.DateField()
-    time=models.TimeField()
-    duration=models.DurationField()
-    venue_details=models.TextField()
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now=True)
-
-
-    def __str__(self):
-        return self.title
-    
-
 class Organizer(AbstractBaseUser):
     name=models.CharField(max_length=40)
     email=models.EmailField(unique=True)
@@ -41,6 +26,23 @@ class Organizer(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return self.is_superuser
+    
+
+
+class Events(models.Model):
+    title=models.CharField(max_length=40)
+    description=models.TextField()
+    date=models.DateField()
+    time=models.TimeField()
+    organization=models.ForeignKey(Organizer,on_delete=models.CASCADE)
+    duration=models.DurationField()
+    venue_details=models.TextField()
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+
+    def __str__(self):
+        return self.title
     
 
 
