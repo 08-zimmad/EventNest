@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 
-load_dotenv()   
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,8 +31,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
      'rest_framework',
      'authenticate_',
-     'rest_framework.authtoken',
      'rest_framework_simplejwt',
+     'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google'
 ]
 
 MIDDLEWARE = [
@@ -43,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'event_nest.urls'
@@ -140,8 +145,40 @@ REST_AUTH_SERIALIZERS = {
 
 
 AUTHENTICATION_BACKENDS = [
-    # 'django.contrib.auth.backends.ModelBackend',
     'authenticate_.auth_backend.OrganizerBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# AUTH_USER_MODEL = 'auth.User'
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'APP': {
+            'client_id': '540176462828-umd5cd32l7lf21vauq8s6nohs125mfqd.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    },
+    'github': {
+        'APP': {
+            'client_id': 'Ov23liXmKPbN38r33oNh',
+            'secret': '65b6ae80136ec385df98cdd6f2fb814e326895ac',
+            'key': ''
+        },
+         'SCOPE': [
+            'user',
+            'repo',
+        ],
+    }
+    
+}
+
+SITE_ID = 1
