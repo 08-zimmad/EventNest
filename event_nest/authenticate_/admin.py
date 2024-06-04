@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
-from .models import Organizer
+from .models import Organizer,Events
 
 class OrganizerCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
@@ -55,3 +55,4 @@ class OrganizerAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 admin.site.register(Organizer, OrganizerAdmin)
+admin.site.register(Events)

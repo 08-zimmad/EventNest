@@ -34,7 +34,7 @@ class Events(models.Model):
     description=models.TextField()
     date=models.DateField()
     time=models.TimeField()
-    organization=models.ForeignKey(Organizer,on_delete=models.CASCADE)
+    organization=models.ForeignKey(Organizer,on_delete=models.CASCADE, related_name='events_set')
     duration=models.DurationField()
     venue_details=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
