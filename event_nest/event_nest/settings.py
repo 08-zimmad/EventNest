@@ -130,9 +130,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'authenticate_.authenticate.CustomJWTAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
     )
 }
 
@@ -146,8 +146,18 @@ REST_AUTH_SERIALIZERS = {
 
 AUTHENTICATION_BACKENDS = [
     'authenticate_.auth_backend.OrganizerBackend',
+    'authenticate_.auth_backend.UserBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    'ROTATE_REFRESH_TOKENS': True,
+}
 
 
 
@@ -182,3 +192,5 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SITE_ID = 1
+
+AUTH_USER_MODEL = 'auth.User'
