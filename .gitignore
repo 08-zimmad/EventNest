@@ -1,2 +1,5 @@
 /.venv
 .env
+env.txt
+db_connection.py
+/authenticate_/test.py
