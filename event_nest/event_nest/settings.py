@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         #JWT
-        'authenticate_.authenticate.CustomJWTAuthentication',
+        'authenticate_.authentication_class.CustomJWTAuthentication',
 
         #Oauth
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
