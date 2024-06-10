@@ -30,7 +30,7 @@ class Organizer(AbstractBaseUser):
 
 
 class Events(models.Model):
-    title=models.CharField(max_length=40)
+    title=models.CharField(max_length=40, unique=True)
     description=models.TextField()
     date=models.DateField()
     time=models.TimeField()

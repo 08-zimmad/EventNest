@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Organizer,Events
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 
 
 class OrganizerSerializer(serializers.ModelSerializer):
@@ -13,18 +15,18 @@ class OrganizerSerializer(serializers.ModelSerializer):
             'is_staff': {'read_only': True},
         }
 
-
-# # used for creating data instances in model
-#     def create(self, validated_data):
-#         user = Organizer.objects.create_user(
-#             name=validated_data['name'],
-#             email=validated_data['email'],
-#             password=validated_data['password'],
-#             organization=validated_data['organization']
-#         )
-#         return user
+    def create(self, validated_data):
+        user = Organizer.objects.create_user(
+            name=validated_data['name'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            organization=validated_data['organization']
+        )
+        return user
 
 
+
+    
 class EventsSerializer(serializers.ModelSerializer):
     class Meta:
         model=Events
@@ -32,15 +34,11 @@ class EventsSerializer(serializers.ModelSerializer):
 
 
 
-# serializers.py
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'
     def validate(self, attrs):
-        # Override this method to use email instead of username
         email = attrs.get("email", None)
         password = attrs.get("password", None)
         if email and password:
@@ -70,3 +68,23 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['user_type'] = 'organizer' if hasattr(user, 'organization') else 'user'
         return token
 
+
+
+
+
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+
+    def validate(self, attrs):
+        refresh = attrs['refresh']
+        token = RefreshToken(refresh)
+
+        data = {
+            'access': str(token.access_token)
+        }
+
+
+        # Optionally, add custom claims to the new access token
+        user = self.context['request'].user
+        token['user_type'] = 'organizer' if hasattr(user, 'organization') else 'user'
+
+        return data

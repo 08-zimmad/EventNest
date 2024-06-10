@@ -1,6 +1,8 @@
 from rest_framework.permissions import BasePermission
 
+class CustomModelPermission(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated
 
-class isOrganizer(BasePermission):
-    def has_object_permissions(self, request, view, obj):
-        return obj.organization==request.user
+    def has_object_permission(self, request, view, obj):
+        return obj.organization == request.user

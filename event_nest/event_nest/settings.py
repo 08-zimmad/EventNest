@@ -29,14 +29,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
+
+    #apps
      'authenticate_',
+
+     # JWT
      'rest_framework_simplejwt',
-     'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.google'
+
+     #drf
+      'rest_framework',
+
+      #Oauth
+      'oauth2_provider',
+      'social_django',
+      'drf_social_oauth2',
+
+    
 ]
 
 MIDDLEWARE = [
@@ -47,7 +55,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'event_nest.urls'
@@ -55,7 +62,7 @@ ROOT_URLCONF = 'event_nest.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'authenticate_/templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -63,6 +70,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                #oauth2
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -130,7 +141,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        #JWT
         'authenticate_.authenticate.CustomJWTAuthentication',
+
+        #Oauth
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
+        'drf_social_oauth2.authentication.SocialAuthentication',
+
         # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
     )
@@ -140,14 +157,24 @@ REST_FRAMEWORK = {
 
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+    'USER_DETAILS_SERIALIZER': 'authenticate_.serializer.OrganizerSerializer',
 }
 
 
 AUTHENTICATION_BACKENDS = [
-    'authenticate_.auth_backend.OrganizerBackend',
     'authenticate_.auth_backend.UserBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'authenticate_.auth_backend.OrganizerBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+
+    #oauth
+    # 'authenticate_.auth_backend.CustomUserOAuth2',
+    # 'django.contrib.auth.backends.ModelBackend',
+#     'drf_social_oauth2.backends.DjangoOAuth2'
+#    'social_core.backends.google.GoogleOAuth2',
 ]
 
 
@@ -161,36 +188,62 @@ SIMPLE_JWT = {
 
 
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'APP': {
-            'client_id': '540176462828-umd5cd32l7lf21vauq8s6nohs125mfqd.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        },
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    },
-    'github': {
-        'APP': {
-            'client_id': 'Ov23liXmKPbN38r33oNh',
-            'secret': '65b6ae80136ec385df98cdd6f2fb814e326895ac',
-            'key': ''
-        },
-         'SCOPE': [
-            'user',
-            'repo',
-        ],
-    }
-    
+
+# AUTH_USER_MODEL = 'auth.User'
+
+
+
+
+
+
+# Oauth2 Settings for custom Auth Models
+
+
+
+
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
+    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
+    'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
+    'CLIENT_SECRET_GENERATOR_CLASS': 'oauth2_provider.generators.ClientSecretGenerator',
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access your groups'},
 }
 
-SITE_ID = 1
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
 
-AUTH_USER_MODEL = 'auth.User'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'authenticate_.social_pipelines.save_profile',
+    'authenticate_.social_pipelines.get_email',  # Custom pipeline step
+)
+
+
+
+# OAUTH2_PROVIDER = {
+
+#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+# }
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email','profile']
+
+REST_SOCIAL_OAUTH2_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'authenticate_.serializer.OrganizerSerializer',
+}
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
+
+LOGIN_REDIRECT_URL='auth/'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
