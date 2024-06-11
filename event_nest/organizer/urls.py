@@ -19,7 +19,8 @@ urlpatterns = [
     #oauth2
     path('social/', include('social_django.urls', namespace='social')),
     re_path(r'^oauth2/', include('drf_social_oauth2.urls', namespace='drf')),
-    # re_path(r'^/social/complete/google-oauth2/', include('social_django.urls', namespace='google-oauth2-complete')),
-    path('google-login/', google_login, name='google_login'),
+    path('google-login/', google_login, name='google_login')
 ]
+
+
 

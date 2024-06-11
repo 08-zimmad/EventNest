@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #apps
-     'authenticate_',
+     'organizer',
 
      # JWT
      'rest_framework_simplejwt',
@@ -62,7 +62,7 @@ ROOT_URLCONF = 'event_nest.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'authenticate_/templates'], 
+        'DIRS': [BASE_DIR / 'organizer/templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         #JWT
-        'authenticate_.authentication_class.CustomJWTAuthentication',
+        'organizer.authentication_class.CustomJWTAuthentication',
 
         #Oauth
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
@@ -157,24 +157,19 @@ REST_FRAMEWORK = {
 
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'authenticate_.serializer.OrganizerSerializer',
+    'USER_DETAILS_SERIALIZER': 'organizer.serializer.OrganizerSerializer',
 }
 
 
 AUTHENTICATION_BACKENDS = [
-    'authenticate_.auth_backend.UserBackend',
-    'authenticate_.auth_backend.OrganizerBackend',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'organizer.auth_backend.UserBackend',
+    'organizer.auth_backend.OrganizerBackend',
+
+
 
     'social_core.backends.google.GoogleOAuth2',
-    # drf-social-oauth2
     'drf_social_oauth2.backends.DjangoOAuth2',
 
-    #oauth
-    # 'authenticate_.auth_backend.CustomUserOAuth2',
-    # 'django.contrib.auth.backends.ModelBackend',
-#     'drf_social_oauth2.backends.DjangoOAuth2'
-#    'social_core.backends.google.GoogleOAuth2',
 ]
 
 
@@ -198,10 +193,6 @@ SIMPLE_JWT = {
 
 # Oauth2 Settings for custom Auth Models
 
-
-
-
-
 OAUTH2_PROVIDER = {
     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
@@ -220,21 +211,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-    'authenticate_.social_pipelines.save_profile',
-    'authenticate_.social_pipelines.get_email',  # Custom pipeline step
+    'organizer.social_pipelines.save_profile',
 )
-
-
-
-# OAUTH2_PROVIDER = {
-
-#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
-# }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email','profile']
 
 REST_SOCIAL_OAUTH2_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'authenticate_.serializer.OrganizerSerializer',
+    'USER_DETAILS_SERIALIZER': 'organizer.serializer.OrganizerSerializer',
 }
 
 

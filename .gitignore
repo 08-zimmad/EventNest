@@ -2,3 +2,8 @@
 .env
 env.txt
 db_connection.py
+
+
+#
+/event_nest/event_nest/__pycache__
+/event_nest/organizer/__pycache__

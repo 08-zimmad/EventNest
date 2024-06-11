@@ -73,7 +73,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
-
     def validate(self, attrs):
         refresh = attrs['refresh']
         token = RefreshToken(refresh)
@@ -81,10 +80,7 @@ class CustomTokenRefreshSerializer(TokenRefreshSerializer):
         data = {
             'access': str(token.access_token)
         }
-
-
         # Optionally, add custom claims to the new access token
         user = self.context['request'].user
         token['user_type'] = 'organizer' if hasattr(user, 'organization') else 'user'
-
         return data

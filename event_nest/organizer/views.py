@@ -32,7 +32,7 @@ class OrganizerRegisterView(APIView):
 
 
 class EventView(APIView):
-    permission_classes = [ CustomModelPermission]   #
+    permission_classes = [CustomModelPermission]
     authentication_classes=[CustomJWTAuthentication]
 
 

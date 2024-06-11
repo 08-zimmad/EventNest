@@ -2,7 +2,7 @@ from django.contrib.auth.backends import ModelBackend
 from .models import Organizer
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import BaseBackend
-from authenticate_.models import Organizer
+from organizer.models import Organizer
 from drf_social_oauth2.authentication import SocialAuthentication
 from oauth2_provider.models import AccessToken
 from django.utils import timezone

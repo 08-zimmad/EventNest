@@ -7,7 +7,8 @@ from django.conf import settings
 class Organizer(AbstractBaseUser):
     name=models.CharField(max_length=40)
     email=models.EmailField(unique=True)
-    organization=models.CharField(max_length=40)
+    organization=models.CharField(max_length=40, null=True)
+    
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
