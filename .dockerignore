@@ -7,10 +7,9 @@
 .docker
 
 #python
-app/__pycache__/
-app/*/__pycache__/
-app/*/*/__pycache__/
-app/*/*/*/__pycache__/
-.env/
-.venv/
-venv/
+# */event_nest/__pycache__/
+# app/*/__pycache__/
+# app/*/*/__pycache__/
+# app/*/*/*/__pycache__/
+# .env/
+*/.venv/

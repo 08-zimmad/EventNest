@@ -1,12 +1,33 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:13
+    ports:
+    - 5432:5432
+    environment:
+
+      POSTGRES_DB: event_nest
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    container_name: postgres_container
   app:
     build:
       context: .
+      args:
+        - DEV=true
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      - .:/app/event_nest
+    image: app:event_nest
+    container_name: django_container
+    command:  python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    environment:
+      DB_NAME: event_nest
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_HOST: db
+      DB_PORT: 5432

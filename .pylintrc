@@ -1,0 +1,10 @@
+[MASTER]
+
+[MESSAGES CONTROL]
+
+disable=
+    invalid-str-returned,
+    missing-docstring,
+    unused-argument,
+    no-member,
+    arguments-renamed,
