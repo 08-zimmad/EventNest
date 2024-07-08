@@ -1,0 +1,496 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /attendee/api/:
+    get:
+      operationId: attendee_api_retrieve
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: attendee_api_create
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: attendee_api_destroy
+      tags:
+      - attendee
+      responses:
+        '204':
+          description: No response body
+  /attendee/api/{id}/:
+    get:
+      operationId: attendee_api_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: attendee_api_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: attendee_api_destroy_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - attendee
+      responses:
+        '204':
+          description: No response body
+  /attendee/api/get_all/:
+    get:
+      operationId: attendee_api_get_all_retrieve
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+  /attendee/api/profile/:
+    get:
+      operationId: attendee_api_profile_retrieve
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: attendee_api_profile_update
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+  /attendee/api/rate/{id}/:
+    post:
+      operationId: attendee_api_rate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - attendee
+      responses:
+        '200':
+          description: No response body
+  /attendee/api/token/:
+    post:
+      operationId: attendee_api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - attendee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /attendee/api/token/refresh:
+    post:
+      operationId: attendee_api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - attendee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenRefresh'
+          description: ''
+  /organizer/api/{event_id}/:
+    get:
+      operationId: organizer_api_retrieve
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: organizer_api_create
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: organizer_api_update
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: organizer_api_partial_update
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: organizer_api_destroy
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '204':
+          description: No response body
+  /organizer/api/attendance/{id}/:
+    post:
+      operationId: organizer_api_attendance_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/api/event/{id}/:
+    get:
+      operationId: organizer_api_event_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/api/events/:
+    get:
+      operationId: organizer_api_events_retrieve
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: organizer_api_events_create
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: organizer_api_events_update
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: organizer_api_events_partial_update
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: organizer_api_events_destroy
+      tags:
+      - organizer
+      responses:
+        '204':
+          description: No response body
+  /organizer/api/get_attendees/{id}/:
+    get:
+      operationId: organizer_api_get_attendees_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/api/profile/:
+    get:
+      operationId: organizer_api_profile_retrieve
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: organizer_api_profile_update
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/api/register/:
+    post:
+      operationId: organizer_api_register_create
+      tags:
+      - organizer
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /organizer/api/token/:
+    post:
+      operationId: organizer_api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - organizer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /organizer/api/token/refresh:
+    post:
+      operationId: organizer_api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - organizer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenRefresh'
+          description: ''
+  /organizer/api/uploadfile/{id}/:
+    post:
+      operationId: organizer_api_uploadfile_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/convert-token/:
+    post:
+      operationId: organizer_oauth2_convert_token_create
+      description: |-
+        Implements an endpoint to convert a provider token to an access token
+
+        The endpoint is used in the following flows:
+
+        * Authorization code
+        * Client credentials
+      tags:
+      - organizer
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/disconnect-backend/:
+    post:
+      operationId: organizer_oauth2_disconnect_backend_create
+      description: An endpoint for disconnect social auth backend providers such as
+        Facebook.
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/invalidate-refresh-tokens/:
+    post:
+      operationId: organizer_oauth2_invalidate_refresh_tokens_create
+      description: Invalidate all refresh tokens associated with a client id.
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/invalidate-sessions/:
+    post:
+      operationId: organizer_oauth2_invalidate_sessions_create
+      description: Delete all access tokens associated with a client id.
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/revoke-token/:
+    post:
+      operationId: organizer_oauth2_revoke_token_create
+      description: Implements an endpoint to revoke access or refresh tokens
+      tags:
+      - organizer
+      responses:
+        '200':
+          description: No response body
+  /organizer/oauth2/token/:
+    post:
+      operationId: organizer_oauth2_token_create
+      description: |-
+        Implements an endpoint to provide access tokens
+
+        The endpoint is used in the following flows:
+
+        * Authorization code
+        * Password
+        * Client credentials
+      tags:
+      - organizer
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    CustomTokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    CustomTokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows: {}
