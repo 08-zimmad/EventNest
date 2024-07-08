@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import AttendeeEvent, EmailTemplate
 
-# Register your models here.
+admin.site.register(AttendeeEvent)
+admin.site.register(EmailTemplate)
