@@ -1,8 +1,7 @@
-
-from pathlib import Path
-from dotenv import load_dotenv
 import os
-
+from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,6 +31,8 @@ INSTALLED_APPS = [
 
     #apps
      'organizer',
+     'attendee',
+     'authentication',
 
      # JWT
      'rest_framework_simplejwt',
@@ -44,6 +45,9 @@ INSTALLED_APPS = [
       'social_django',
       'drf_social_oauth2',
 
+      # API documentation-swagger
+      'drf_spectacular',
+
     
 ]
 
@@ -55,8 +59,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
 
+]
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 ROOT_URLCONF = 'event_nest.urls'
 
 TEMPLATES = [
@@ -91,7 +98,7 @@ DATABASES = {
         'NAME': os.environ['DB_NAME'],
         'USER': os.environ['DB_USER'],
         'PASSWORD':os.environ['DB_PASSWORD'],
-        'HOST': os.environ['DB_HOST'],
+        'HOST': os.environ['DB_HOST'], 
         'PORT':  os.environ['DB_PORT'],
     }
 }
@@ -138,19 +145,20 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MEDIA_ROOT = BASE_DIR / 'media/'
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         #JWT
-        'organizer.authentication_class.CustomJWTAuthentication',
+        'authentication.jwt_authentication_class.CustomJWTAuthentication',
 
         #Oauth
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
-        'drf_social_oauth2.authentication.SocialAuthentication',
-
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
-    )
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication'
+    ),
+    # Spectacular- swagger
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -163,62 +171,54 @@ REST_AUTH_SERIALIZERS = {
 
 AUTHENTICATION_BACKENDS = [
     'organizer.auth_backend.UserBackend',
-    'organizer.auth_backend.OrganizerBackend',
+    'organizer.auth_backend.EventNestUserBackend',
 
-
-
+    # Oauth2 google backends
     'social_core.backends.google.GoogleOAuth2',
     'drf_social_oauth2.backends.DjangoOAuth2',
 
 ]
 
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-
-
-
-# AUTH_USER_MODEL = 'auth.User'
-
-
-
-
-
-
 # Oauth2 Settings for custom Auth Models
-
-OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
-    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
-    'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
-    'CLIENT_SECRET_GENERATOR_CLASS': 'oauth2_provider.generators.ClientSecretGenerator',
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access your groups'},
-}
+# OAUTH2_PROVIDER = {
+#     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
+#     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
+#     'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
+#     'CLIENT_SECRET_GENERATOR_CLASS': 'oauth2_provider.generators.ClientSecretGenerator',
+#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access your groups'},
+# }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
-
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
+    
     'social_core.pipeline.social_auth.social_user',
+    # 'authentication.social_pipelines.social_user',
+    'social_core.pipeline.social_auth.associate_by_email',
+    # 'social_core.pipeline.social_auth.associate_custom_user',
+    'authentication.social_pipelines.associate_custom_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-    'organizer.social_pipelines.save_profile',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email','profile']
 
-REST_SOCIAL_OAUTH2_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'organizer.serializer.OrganizerSerializer',
-}
+
+
+# custom storage
+SOCIAL_AUTH_STORAGE = 'authentication.oauth2_storage.CustomDjangoStorage'
 
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
@@ -226,7 +226,29 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
-LOGIN_REDIRECT_URL='auth/'
+
+REST_SOCIAL_OAUTH2_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'organizer.serializer.EventNestUserSerializer',
+}
+
+
+LOGIN_REDIRECT_URL='/'
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+
+
+# email settings
+EMAIL_BACKEND = os.environ['EMAIL_BACKEND']
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_USE_TLS = os.environ['EMAIL_USE_TLS']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+
+# Spectacular (swagger)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Event Nest',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
