@@ -1,14 +1,15 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from .models import Organizer,Events
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+from django.utils.timezone import now
+from .models import EventNestUsers,Events
 
 
-class OrganizerSerializer(serializers.ModelSerializer):
+
+class EventNestUserSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Organizer
-        fields = [ 'name','email', 'password', 'is_active', 'is_staff',"organization"]
+        model = EventNestUsers
+        fields = [ 'name','email', 'password', 'is_active', 'is_staff',"organization", "role"]
         extra_kwargs = {
             'password': {'write_only': True},
             'is_active': {'read_only': True},
@@ -16,7 +17,18 @@ class OrganizerSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        user = Organizer.objects.create_user(
+        validated_data['password'] = make_password(validated_data.get('password'))
+        user = EventNestUsers.objects.create(**validated_data)
+        return user
+
+
+class EventNestUserOauthSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EventNestUsers
+        fields = [ 'name','email']
+    def create(self, validated_data):
+        user = EventNestUsers.objects.create_user(
             name=validated_data['name'],
             email=validated_data['email'],
             password=validated_data['password'],
@@ -25,62 +37,56 @@ class OrganizerSerializer(serializers.ModelSerializer):
         return user
 
 
-
-    
 class EventsSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=Events
         fields=['title','description','date','time','duration','venue_details']
 
+    def validate(self, attr):
+        event_date = attr['date']
+        event_time = attr['time']
 
+        date_time_now = now()
+        current_date = date_time_now.date()
+        current_time = date_time_now.time()
 
-
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = 'email'
-    def validate(self, attrs):
-        email = attrs.get("email", None)
-        password = attrs.get("password", None)
-        if email and password:
-            user = authenticate(request=self.context.get('request'), email=email, password=password)
-            if not user:
-                raise serializers.ValidationError(
-                    {'error': 'Invalid credentials'}
-                )
-
-            refresh = self.get_token(user)
-
-            data = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-
-            return data
-        else:
+        if (event_date < current_date):
             raise serializers.ValidationError(
-                {'error': 'Must include "email" and "password".'}
+                "Date cannot be in past"
             )
-
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # Add custom claims
-        token['user_type'] = 'organizer' if hasattr(user, 'organization') else 'user'
-        return token
+        elif (event_date == current_date and
+              event_time <= current_time):
+            raise serializers.ValidationError("Time cannot be in past")
+        return attr
 
 
+class OrganizerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EventNestUsers
+        fields = [ 'name','email',"organization"]
 
 
+class OrganizerAttendanceSerializer(serializers.ModelSerializer):
 
-class CustomTokenRefreshSerializer(TokenRefreshSerializer):
-    def validate(self, attrs):
-        refresh = attrs['refresh']
-        token = RefreshToken(refresh)
+    class Meta:
+        model = Events
+        fields = ['present_count']
 
-        data = {
-            'access': str(token.access_token)
-        }
-        # Optionally, add custom claims to the new access token
-        user = self.context['request'].user
-        token['user_type'] = 'organizer' if hasattr(user, 'organization') else 'user'
-        return data
+    # def get_formatted_rating(self,obj):
+    #     return format(obj.rating, '.2f')
+
+
+class EventMediaFilesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Events
+        fields = ['image', 'video', 'file']
+
+
+class GetAttendeeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EventNestUsers
+        fields = ['email','name']
