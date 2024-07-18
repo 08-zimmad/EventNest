@@ -8,3 +8,4 @@ disable=
     unused-argument,
     no-member,
     arguments-renamed,
+    pointless-string-statement,

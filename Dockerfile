@@ -2,9 +2,6 @@ FROM python:3.11-alpine3.20
 LABEL maintainer="zimmad.w@gmail.com"
 
 
-
-
-
 COPY ./requirements.dev.txt /temp/requirements.dev.txt
 COPY ./requirements.txt /temp/requirements.txt
 COPY ./event_nest app/event_nest

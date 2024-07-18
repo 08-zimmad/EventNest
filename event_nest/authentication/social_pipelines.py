@@ -1,35 +1,42 @@
-# authentication/social_pipelines.py
-
-from social_core.exceptions import AuthAlreadyAssociated
 from .models import CustomUserSocialAuth
 from organizer.models import EventNestUsers
-def social_user(backend, uid, user=None, *args, **kwargs):
-    provider = backend.name
+from social_django.models import UserSocialAuth
+
+def custom_social_user(backend, uid, user=None, *args, **kwargs):
+    if user:
+        return {'social': None}
+
     try:
-        social = CustomUserSocialAuth.objects.get(provider=provider, uid=uid)
-    except CustomUserSocialAuth.DoesNotExist:
+        if backend.name == "google-oauth2":
+            social = CustomUserSocialAuth.objects.get(provider=backend.name, uid=uid)
+    except (CustomUserSocialAuth.DoesNotExist):
         social = None
 
     if social:
-        if user and social.user != user:
-            raise AuthAlreadyAssociated(backend)
-        elif not user:
-            user = social.user
+        user = social.user
 
-    return {
-        "social": social,
-        "user": user,
-        "is_new": user is None,
-        "new_association": social is None,
-    }
+    return {'social': social, 'user': user}
 
-def associate_custom_user(backend, uid, user=None, *args, **kwargs):
-    if user:
-        if not isinstance(user, EventNestUsers):
-            raise ValueError("User must be an instance of EventNestUsers")
-        CustomUserSocialAuth.objects.get_or_create(
-            user=user,
-            provider=backend.name,
-            uid=uid,
-        )
-    return {'user': user}
+
+
+
+def custom_associate_user(backend, uid, user=None, social=None, *args, **kwargs):
+    if social:
+        return None
+    
+    if backend.name == 'googe-oauth2':
+        if isinstance(user, EventNestUsers):
+            CustomUserSocialAuth.objects.get_or_create(provider=backend.name, uid=uid, defaults={'user': user})
+    else:
+        if isinstance(user, EventNestUsers):
+            UserSocialAuth.objects.get_or_create(provider=backend.name, uid=uid, defaults={'user': user})
+
+
+
+
+def custom_load_extra_data(backend, details, response, user=None, social=None, *args, **kwargs):
+    if social:
+        social.extra_data = response
+        social.save()
+    return None
+

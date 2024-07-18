@@ -3,17 +3,16 @@
 env.txt
 db_connection.py
 
+event_nest/event_nest/__pycache__/
+event_nest/event_nest/migrations/__pycache__/
 
-#
-/event_nest/event_nest/__pycache__
-/event_nest/event_nest/migrations/__pycache__
-
-/event_nest/organizer/__pycache__
-/event_nest/organizer/migrations/__pycache__
+event_nest/organizer/__pycache__
+event_nest/organizer/migrations/__pycache__
+event_nest/organizer/tests/__pycache__
 
 event_nest/attendee/migrations/__pycache__
 event_nest/attendee/__pycache__
-
+event_nest/attendee/test/__pycache__
 
 event_nest/auth/migrations/__pycache__
 event_nest/auth/__pycache__
