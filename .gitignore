@@ -13,6 +13,7 @@ event_nest/organizer/tests/__pycache__
 event_nest/attendee/migrations/__pycache__
 event_nest/attendee/__pycache__
 event_nest/attendee/test/__pycache__
+event_nest/attendee/utils/__pycache__
 
 event_nest/auth/migrations/__pycache__
 event_nest/auth/__pycache__
