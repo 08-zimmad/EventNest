@@ -48,6 +48,8 @@ INSTALLED_APPS = [
       # API documentation-swagger
       'drf_spectacular',
 
+      # Coverage
+      'coverage',
     
 ]
 
@@ -175,7 +177,6 @@ AUTHENTICATION_BACKENDS = [
 
     # Oauth2 google backends
     'social_core.backends.google.GoogleOAuth2',
-    'drf_social_oauth2.backends.DjangoOAuth2',
 
 ]
 
@@ -186,51 +187,30 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-# Oauth2 Settings for custom Auth Models
-# OAUTH2_PROVIDER = {
-#     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
-#     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
-#     'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
-#     'CLIENT_SECRET_GENERATOR_CLASS': 'oauth2_provider.generators.ClientSecretGenerator',
-#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access your groups'},
-# }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
+
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
-    
-    'social_core.pipeline.social_auth.social_user',
-    # 'authentication.social_pipelines.social_user',
-    'social_core.pipeline.social_auth.associate_by_email',
-    # 'social_core.pipeline.social_auth.associate_custom_user',
-    'authentication.social_pipelines.associate_custom_user',
+    'authentication.social_pipelines.custom_social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-    'social_core.pipeline.social_auth.associate_user',
-    'social_core.pipeline.social_auth.load_extra_data',
+    'authentication.social_pipelines.custom_associate_user',
+    'authentication.social_pipelines.custom_load_extra_data',
     'social_core.pipeline.user.user_details',
 )
-
-
-
-
-# custom storage
-SOCIAL_AUTH_STORAGE = 'authentication.oauth2_storage.CustomDjangoStorage'
-
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
-
 REST_SOCIAL_OAUTH2_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'organizer.serializer.EventNestUserSerializer',
 }
-
 
 LOGIN_REDIRECT_URL='/'
 SOCIAL_AUTH_URL_NAMESPACE = 'social'

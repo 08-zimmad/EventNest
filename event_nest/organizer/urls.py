@@ -7,7 +7,7 @@ from django.urls import path, include
 from .views import (EventNestRegisterView, EventView,
                      UpdateProfileView,
                     MarkAttendanceView, UploadMediaFilesView,
-                    GetEventView, GetAttendeeRegistrationView
+                    GetEventView, RegisteredAttendeeView,
 )
 
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path('api/event/<int:pk>/', GetEventView.as_view()),
     path('api/attendance/<int:pk>/', MarkAttendanceView.as_view()),
     path('api/uploadfile/<int:pk>/', UploadMediaFilesView.as_view()),
-    path('api/get_attendees/<int:pk>/', GetAttendeeRegistrationView.as_view()),
+    path('api/get_attendees/<int:pk>/', RegisteredAttendeeView.as_view()),
 
     #oauth2
     path('social/', include('social_django.urls', namespace='social')),

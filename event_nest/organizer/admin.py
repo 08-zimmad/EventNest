@@ -10,7 +10,7 @@ class EventNestUsersCreationForm(forms.ModelForm):
 
     class Meta:
         model = EventNestUsers
-        fields = ('email','role')
+        fields = ('email','role','organization')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -35,7 +35,7 @@ class EventNestUsersChangeForm(forms.ModelForm):
 
     class Meta:
         model = EventNestUsers
-        fields = ('name', 'email', 'password', 'role', 'is_active', 'is_staff')
+        fields = ('name', 'email', 'password','organization', 'role', 'is_active', 'is_staff')
 
 class EventNestUsersAdmin(BaseUserAdmin):
     form = EventNestUsersChangeForm
@@ -45,7 +45,7 @@ class EventNestUsersAdmin(BaseUserAdmin):
     list_filter = ('is_staff', 'is_active', 'role')
     fieldsets = (
         (None, {
-                'fields': ('name','email', 'password','role')
+                'fields': ('name','email', 'password','organization','role')
             }),
         ('Permissions', {
              'fields': ('is_staff', 'is_active')
@@ -54,7 +54,7 @@ class EventNestUsersAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'password1', 'password2','role')
+            'fields': ('email', 'password1', 'password2','organization','role')
         }),
     )
     search_fields = ('email',)

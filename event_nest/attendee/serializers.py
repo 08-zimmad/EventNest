@@ -3,21 +3,23 @@ from organizer.models import Events, EventNestUsers
 from .models import AttendeeEvent
 
 
-class AttendeeSerializer(serializers.ModelSerializer):
+class GetEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Events
         fields=['title','description','date','time','duration','venue_details']
 
-
-class EventSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model= EventNestUsers
-        fields = [ 'name','email']
+        # def validate(self, attr):
 
 
-class AttendeeRegistrationSerializer(serializers.ModelSerializer):
+# class EventSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model= EventNestUsers
+#         fields = [ 'name','email']
+
+
+class AttendeeRegisterToEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=AttendeeEvent

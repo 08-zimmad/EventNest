@@ -193,14 +193,14 @@ class UploadMediaFilesView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetAttendeeRegistrationView(APIView):
+class RegisteredAttendeeView(APIView):
     permission_classes = [OrganizerPermission]
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request, pk):
         event=get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
-        attendees_events = AttendeeEvent.objects.filter(event=event).select_related('Attendee')
+        attendees_events = AttendeeEvent.objects.filter(event=event)
         attendees = [attendee_event.Attendee for attendee_event in attendees_events]
         serializer = GetAttendeeSerializer(attendees, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

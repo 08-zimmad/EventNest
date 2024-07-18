@@ -4,7 +4,6 @@ from django.db.transaction import TransactionManagementError
 from django.core.validators import MaxValueValidator
 from .manager import EventNestUserManager
 
-
 class EventNestUsers(AbstractBaseUser):
 
     ROLES=[("attendee","Attendee"),
@@ -56,7 +55,7 @@ class Events(models.Model):
         return self.title
 
 
-def register_attendee(events):
+def count_registered_attendees(events):
     try:
         with transaction.atomic():
             event = Events.objects.select_for_update().get(id=events)
@@ -65,3 +64,4 @@ def register_attendee(events):
         return True
     except TransactionManagementError:
         return False
+    
