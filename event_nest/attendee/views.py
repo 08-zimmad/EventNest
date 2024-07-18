@@ -1,11 +1,8 @@
-from smtplib import SMTPConnectError, SMTPServerDisconnected
-
 from authentication.jwt_authentication_class import CustomJWTAuthentication
 from authentication.permissions import AttendeePermission
 from django.conf import settings
-from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from organizer.models import EventNestUsers, Events, register_attendee
+from organizer.models import EventNestUsers, Events, count_registered_attendees
 from organizer.serializer import EventNestUserSerializer
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -15,18 +12,18 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import AttendeeEvent, EmailTemplate
 from .serializers import (AttendeeProfileSerializer,
-                          AttendeeRegistrationSerializer, AttendeeSerializer,
+                          AttendeeRegisterToEventSerializer, GetEventSerializer,
                           RatingSerializer)
+from .utils.email import send_email_to_attendee
 
 
-class AttendeeRegistration(APIView):
+class AttendeeRegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         data = request.data
         data.update({"organization":None})
         serializer = EventNestUserSerializer(data=data)
-
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
@@ -38,64 +35,34 @@ class AttendeeRegistration(APIView):
             status = status.HTTP_201_CREATED
             )
 
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EventRegistration(APIView):
+class EventView(APIView):
     permission_classes = [AttendeePermission]
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request, pk):
         events=get_object_or_404(Events, id=pk)
-        serializer=AttendeeSerializer(events)
+        serializer=GetEventSerializer(events)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request,pk):
         event=get_object_or_404(Events, id=pk)
         attendee = EventNestUsers.objects.get(email=request.user)
-        if register_attendee(events=event.id):
-            attendee_event, created=AttendeeEvent.objects.get_or_create(
-                Attendee=attendee,
-                event=event
-                )
-        else:
-            Response(
-                {
-                    "error":"Some error occured. Try registring again"
-                },
-                status=status.HTTP_429_TOO_MANY_REQUESTS
+        attendee_event, created=AttendeeEvent.objects.get_or_create(
+            Attendee=attendee,
+            event=event
             )
-
-        if created is True:
-            email = EmailTemplate.objects.values('subject','template')
-            subject = email[0]['subject']
-            body = email[0]['template']
+        count_registered_attendees(events=event.id)
+        if created:
+            email = EmailTemplate.objects.all().first()
+            subject = email.subject
+            body = email.template
             from_email = settings.EMAIL_HOST_USER
             recipient_list= [request.user]
-
-            try:
-                send_mail(
-                    subject,
-                    body,
-                    from_email,
-                    recipient_list
-                    )
-                AttendeeRegistrationSerializer(data=attendee_event)
-            except SMTPConnectError:
-                return Response(
-                    {
-                        "error":"Server Connection Error"
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            except SMTPServerDisconnected:
-                return Response(
-                    {
-                        "error":"Server Connection Error"
-                    },
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
+            AttendeeRegisterToEventSerializer(data=attendee_event)
+            send_email_to_attendee(subject, body, from_email, recipient_list)
             return Response(
                 {
                     'data':"Registered Successfully"
@@ -139,10 +106,10 @@ class FetchAllEventsViews(APIView):
         events=Events.objects.all()
 
         if events is not None:
-            serializer=AttendeeSerializer(events, many=True)
+            serializer=GetEventSerializer(events, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
 class UpdateProfileView(APIView):

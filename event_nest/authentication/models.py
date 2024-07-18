@@ -1,14 +1,14 @@
 from django.db import models
-from social_django.models import UserSocialAuth
 from organizer.models import EventNestUsers
 
 class CustomUserSocialAuth(models.Model):
-    user = models.ForeignKey(EventNestUsers, on_delete=models.CASCADE)
-    provider = models.CharField(max_length=32)
+    user = models.ForeignKey(EventNestUsers, on_delete=models.CASCADE, related_name='social_auth')
+    provider = models.CharField(max_length=255)
     uid = models.CharField(max_length=255)
-    extra_data = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    extra_data = models.JSONField(default=dict)
 
     class Meta:
-        db_table = 'custom_user_social_auth'
+        unique_together = ('provider', 'uid')
+
+    def __str__(self):
+        return f'{self.user.email} - {self.provider}'
