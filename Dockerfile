@@ -23,8 +23,7 @@ RUN python -m venv /py && \
         --no-create-home \
         django-user
 
-
-
+CMD ["python", "manage.py", "runserver"]
 ENV PATH="/py/bin:$PATH"
 
 USER django-user

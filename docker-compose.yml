@@ -1,12 +1,9 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:13
     ports:
     - 5432:5432
     environment:
-
       POSTGRES_DB: event_nest
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -22,7 +19,8 @@ services:
       - .:/app/event_nest
     image: app:event_nest
     container_name: django_container
-    command:  python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
     environment:
