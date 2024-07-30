@@ -6,11 +6,10 @@ from organizer.models import EventNestUsers
 class CustomJWTAuthentication(JWTAuthentication):
 
     def get_user(self, validated_token):
-        user=None
+        user = None
         user_id = validated_token.get('user_id')
         user = get_object_or_404(EventNestUsers, id=user_id)
         return user
-
 
     def authenticate(self, request):
         header = self.get_header(request)

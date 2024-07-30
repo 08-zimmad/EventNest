@@ -11,9 +11,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import AttendeeEvent, EmailTemplate
-from .serializers import (AttendeeProfileSerializer,
-                          AttendeeRegisterToEventSerializer, GetEventSerializer,
-                          RatingSerializer)
+from .serializers import (
+    AttendeeProfileSerializer,
+    AttendeeRegisterToEventSerializer,
+    GetEventSerializer,
+    RatingSerializer
+    )
 from .utils.email import send_email_to_attendee
 
 
@@ -22,18 +25,18 @@ class AttendeeRegistrationView(APIView):
 
     def post(self, request):
         data = request.data
-        data.update({"organization":None})
+        data.update({"organization": None})
         serializer = EventNestUserSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             return Response(
-            {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            },
-            status = status.HTTP_201_CREATED
-            )
+                {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)
+                },
+                status=status.HTTP_201_CREATED
+                )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -43,14 +46,14 @@ class EventView(APIView):
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request, pk):
-        events=get_object_or_404(Events, id=pk)
-        serializer=GetEventSerializer(events)
+        events = get_object_or_404(Events, id=pk)
+        serializer = GetEventSerializer(events)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request,pk):
-        event=get_object_or_404(Events, id=pk)
+    def post(self, request, pk):
+        event = get_object_or_404(Events, id=pk)
         attendee = EventNestUsers.objects.get(email=request.user)
-        attendee_event, created=AttendeeEvent.objects.get_or_create(
+        attendee_event, created = AttendeeEvent.objects.get_or_create(
             Attendee=attendee,
             event=event
             )
@@ -60,41 +63,45 @@ class EventView(APIView):
             subject = email.subject
             body = email.template
             from_email = settings.EMAIL_HOST_USER
-            recipient_list= [request.user]
+            recipient_list = str(request.user)
             AttendeeRegisterToEventSerializer(data=attendee_event)
             send_email_to_attendee(subject, body, from_email, recipient_list)
             return Response(
                 {
-                    'data':"Registered Successfully"
+                    'data': "Registered Successfully"
                 },
                 status=status.HTTP_200_OK
             )
 
         return Response(
             {
-                'data':"Already Registered"
+                'data': "Already Registered"
             },
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
     def delete(self, request, pk):
         get_object_or_404(Events, id=pk)
-        data=AttendeeEvent.objects.filter(
+        data = AttendeeEvent.objects.filter(
             Attendee__email=request.user,
             event__id=pk
             ).prefetch_related('Attendee', 'event')
+        self.check_object_permissions(request, data)
 
-        self.check_object_permissions(request,data)
+        if data.exists():
+            data.delete()
+            return Response(
+                {
+                    'success': "Successfully deleted"
+                },
+                status=status.HTTP_200_OK
+            )
 
-        if not data.exists():
-            return Response({'error':"Selected Entry does not exists"})
-
-        data.delete()
         return Response(
             {
-                'success':"Successfully deleted"
+                'error': "Selected Entry does not exists"
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_404_NOT_FOUND
         )
 
 
@@ -103,10 +110,10 @@ class FetchAllEventsViews(APIView):
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request):
-        events=Events.objects.all()
+        events = Events.objects.all()
 
         if events is not None:
-            serializer=GetEventSerializer(events, many=True)
+            serializer = GetEventSerializer(events, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
@@ -129,11 +136,11 @@ class UpdateProfileView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return  Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(
             {
-                'error':serializer.errors
+                'error': serializer.errors
             },
             status=status.HTTP_400_BAD_REQUEST
         )
@@ -161,12 +168,12 @@ class GiveRating(APIView):
                 {
                     "error": "Rating should be 1 to 5"
                 },
-                status=status.HTTP_403_FORBIDDEN
+                status=status.HTTP_400_BAD_REQUEST
             )
         else:
             rating = (event.rating + request.data['rating'])/2
 
-        serializer = RatingSerializer(event,data={'rating':rating})
+        serializer = RatingSerializer(event, data={'rating': rating})
 
         if serializer.is_valid():
             serializer.save()

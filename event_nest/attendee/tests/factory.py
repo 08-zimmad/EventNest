@@ -10,6 +10,7 @@ class AttendeeEventFactory(factory.django.DjangoModelFactory):
     Attendee = factory.SubFactory(EventNestUserFactory)
     event = factory.SubFactory(EventsFactory)
 
+
 class EmailTemplateFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EmailTemplate

@@ -5,28 +5,18 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-def send_email_to_attendee(subject, body,
-                           from_email, recipient_list):
-    
+def send_email_to_attendee(subject, body, from_email, recipient_list):
     try:
         send_mail(
             subject,
             body,
             from_email,
-            recipient_list
+            [recipient_list]
         )
-    except SMTPConnectError:
+    except (SMTPConnectError, SMTPServerDisconnected):
         return Response(
             {
-                "error":"Server Connection Error"
+                "error": "Server Connection Error"
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-    except SMTPServerDisconnected:
-        return Response(
-
-            {
-                "error":"Server Connection Error"        
-            },
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+            )

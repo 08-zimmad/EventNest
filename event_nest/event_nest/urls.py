@@ -21,7 +21,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('organizer/',include("organizer.urls")),
+    path('organizer/', include("organizer.urls")),
     path('attendee/', include("attendee.urls")),
 
     # Spectacular

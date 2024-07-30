@@ -1,5 +1,5 @@
-from django.contrib import admin
-from .models import CustomUserSocialAuth
+# from django.contrib import admin
+# from .models import CustomUserSocialAuth
 # Register your models here.
 
-admin.site.register(CustomUserSocialAuth)
+# admin.site.register(CustomUserSocialAuth)

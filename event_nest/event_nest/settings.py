@@ -19,6 +19,10 @@ DEBUG=os.environ['DEBUG']
 ALLOWED_HOSTS = []
 
 
+# time zone
+TIME_ZONE = 'Asia/Karachi'
+USE_TZ = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -106,6 +110,9 @@ DATABASES = {
 }
 
 
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -163,13 +170,9 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-
-
-
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'organizer.serializer.OrganizerSerializer',
 }
-
 
 AUTHENTICATION_BACKENDS = [
     'organizer.auth_backend.UserBackend',
@@ -177,7 +180,6 @@ AUTHENTICATION_BACKENDS = [
 
     # Oauth2 google backends
     'social_core.backends.google.GoogleOAuth2',
-
 ]
 
 
@@ -198,8 +200,8 @@ SOCIAL_AUTH_PIPELINE = (
     'authentication.social_pipelines.custom_social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-    'authentication.social_pipelines.custom_associate_user',
-    'authentication.social_pipelines.custom_load_extra_data',
+    # 'authentication.social_pipelines.custom_associate_user',
+    # 'authentication.social_pipelines.custom_load_extra_data',
     'social_core.pipeline.user.user_details',
 )
 
