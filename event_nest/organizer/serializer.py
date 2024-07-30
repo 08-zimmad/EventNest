@@ -1,11 +1,14 @@
+from datetime import datetime
+
 from django.contrib.auth.hashers import make_password
-from django.utils.timezone import now
 from rest_framework import serializers
 
 from .models import EventNestUsers, Events
 
+
 class EventNestUserSerializer(serializers.ModelSerializer):
     class Meta:
+
         model = EventNestUsers
         fields = ['name', 'email', 'password', 'organization', 'role']
         extra_kwargs = {
@@ -15,26 +18,34 @@ class EventNestUserSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        if ('name' in attrs and 
-            not isinstance(attrs["name"], str)):
-                raise serializers.ValidationError("Name should not be integers")
+        if (
+            'name' in attrs and
+            not isinstance(attrs["name"], str)
+        ):
+            raise serializers.ValidationError("Name should not be integers")
 
         if 'email' in attrs:
             if not attrs['email']:
-                raise serializers.ValidationError("Email field cannot be empty")
+                raise serializers.ValidationError(
+                    "Email field cannot be empty"
+                    )
             if not serializers.EmailField().to_internal_value(attrs['email']):
-                raise serializers.ValidationError("Invalid email format")
+                raise serializers.ValidationError(
+                    "Invalid email format"
+                    )
 
         if 'role' in attrs:
             valid_roles = ['attendee', 'organizer']
             if attrs['role'].lower() not in valid_roles:
-                raise serializers.ValidationError("Role should be either 'attendee' or 'organizer'")
+                raise serializers.ValidationError(
+                    "Role should be either attendee or organizer"
+                    )
 
         return attrs
 
-
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data.get('password'))
+        validated_data['password'] = make_password(
+            validated_data.get('password'))
         user = EventNestUsers.objects.create(**validated_data)
         return user
 
@@ -48,55 +59,53 @@ class EventNestUserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class EventNestUserOauthSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = EventNestUsers
-        fields = [ 'name','email']
-    def create(self, validated_data):
-        user = EventNestUsers.objects.create_user(
-            name=validated_data['name'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            organization=validated_data['organization']
-        )
-        return user
-
-
 class EventsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model=Events
-        fields=['title','description','date','time','duration','venue_details']
+        model = Events
+        fields = [
+            'title',
+            'description',
+            'date',
+            'time',
+            'duration',
+            'venue_details']
 
     def validate(self, attr):
-        event_date = attr['date']
-        event_time = attr['time']
-        title = attr['title']
-        description = attr['description']
-        venue_details = attr['venue_details']
-        
+        date_time = datetime.now()
+        current_date = date_time.date()
+        current_time = date_time.time()
 
-        date_time_now = now()
-        current_date = date_time_now.date()
-        current_time = date_time_now.time()
+        if "date" in attr and "time" in attr:
+            event_date = attr['date']
+            event_time = attr['time']
+            if event_date < current_date:
+                raise serializers.ValidationError("Date cannot be in the past")
+            elif event_date == current_date and event_time <= current_time:
+                raise serializers.ValidationError(
+                    "Time cannot be in the past"
+                    )
 
-        if (event_date < current_date):
-            raise serializers.ValidationError(
-                "Date cannot be in past"
-            )
-        elif (event_date == current_date and
-              event_time <= current_time):
-            raise serializers.ValidationError("Time cannot be in past")
-        
-        if not isinstance(title, str):
-            raise serializers.ValidationError("Title must be a string")
-        
-        if not isinstance(description, str):
-            raise serializers.ValidationError("description must be a string")
+        if "title" in attr:
+            title = attr['title']
+            if not isinstance(title, str):
+                raise serializers.ValidationError(
+                    "Title must be a string"
+                    )
 
-        if not isinstance(venue_details, str):
-            raise serializers.ValidationError("venue_details must be a string")
+        if "description" in attr:
+            description = attr['description']
+            if not isinstance(description, str):
+                raise serializers.ValidationError(
+                    "Description must be a string"
+                    )
+
+        if "venue_details" in attr:
+            venue_details = attr['venue_details']
+            if not isinstance(venue_details, str):
+                raise serializers.ValidationError(
+                    "Venue details must be a string"
+                    )
 
         return attr
 
@@ -105,8 +114,7 @@ class OrganizerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventNestUsers
-        fields = [ 'name','email',"organization"]
-
+        fields = ['name', 'email', "organization"]
 
 
 class OrganizerAttendanceSerializer(serializers.ModelSerializer):
@@ -134,4 +142,4 @@ class GetAttendeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventNestUsers
-        fields = ['email','name']
+        fields = ['email', 'name']

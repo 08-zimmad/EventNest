@@ -10,10 +10,11 @@ from rest_framework.permissions import AllowAny
 from attendee.models import AttendeeEvent
 from .models import EventNestUsers
 from .models import Events
-from .serializer import (EventNestUserSerializer, EventsSerializer,
-                         OrganizerSerializer, OrganizerAttendanceSerializer,
-                         EventMediaFilesSerializer, GetAttendeeSerializer
-                        )
+from .serializer import (
+    EventNestUserSerializer, EventsSerializer,
+    OrganizerSerializer, OrganizerAttendanceSerializer,
+    EventMediaFilesSerializer, GetAttendeeSerializer
+    )
 
 
 class EventNestRegisterView(APIView):
@@ -25,45 +26,55 @@ class EventNestRegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-            return Response(
-            {
+            return Response({
                 'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            },
-            status = status.HTTP_201_CREATED
-            )
+                'access': str(refresh.access_token)
+                },
+                status=status.HTTP_201_CREATED
+                )
 
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class GetEventView(APIView):
     permission_classes = [OrganizerPermission]
-    authentication_classes=[CustomJWTAuthentication]
+    authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request, pk):
-        event=get_object_or_404(Events, id=pk)
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
         serializer = EventsSerializer(event)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+            )
 
 
 class EventView(APIView):
     permission_classes = [OrganizerPermission]
-    authentication_classes=[CustomJWTAuthentication]
+    authentication_classes = [CustomJWTAuthentication]
 
-    def get(self,request):
-        user = EventNestUsers.objects.get(email = request.user)
-        events = Events.objects.prefetch_related().filter(organization = user)
+    def get(self, request):
+        user = EventNestUsers.objects.get(email=request.user)
+        events = (Events.objects.prefetch_related()
+                  .filter(organization=user)
+                  )
 
         if events.exists():
-            serializer=EventsSerializer(events, many = True)
-            return Response(serializer.data,status = status.HTTP_200_OK)
+            serializer = EventsSerializer(events, many=True)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+                )
 
         return Response(
             {
                 'error': 'No Event Exists'
             },
-            status= status.HTTP_204_NO_CONTENT
+            status=status.HTTP_204_NO_CONTENT
         )
 
     def post(self, request):
@@ -86,46 +97,64 @@ class EventView(APIView):
                 {
                     'Success': "Event Created Successfully"
                 },
-                    status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
-    def put(self, request, event_id):
-        event = get_object_or_404(Events, id=event_id)
+    def put(self, request, pk):
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
 
-        serializer = EventsSerializer(event, data=request.data, partial=True)
+        serializer = EventsSerializer(instance=event, data=request.data)
         if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+                )
 
-    def patch(self, request, event_id):
-        event = get_object_or_404(Events, id=event_id)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def patch(self, request, pk):
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
 
-        serializer = EventsSerializer(event, request.data, partial=True)
+        serializer = EventsSerializer(
+            instance=event,
+            data=request.data,
+            partial=True
+            )
 
         if serializer.is_valid():
+            serializer.save()
             return Response(
                 {
-                    'success':'Partially Updated'
+                    'success': 'Partially Updated'
                 },
                 status=status.HTTP_200_OK
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
-    def delete(self, request, event_id):
-        event = get_object_or_404(Events, id=event_id)
+    def delete(self, request, pk):
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
         event.delete()
         return Response(
             {
-                'success':"Successfully Deleted"
+                'success': "Successfully Deleted"
             },
-                status=status.HTTP_200_OK
+            status=status.HTTP_200_OK
         )
 
 
@@ -142,39 +171,56 @@ class UpdateProfileView(APIView):
         user = get_object_or_404(EventNestUsers, email=request.user)
         data = request.data
 
-        serializer = OrganizerSerializer(user,data=data)
+        serializer = OrganizerSerializer(user, data=data)
 
         if serializer.is_valid():
             serializer.save()
-            return  Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+                )
 
         return Response(
             {
-                'error':serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
+                'error': serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
             )
 
 
 class MarkAttendanceView(APIView):
     permission_classes = [OrganizerPermission]
     authentication_classes = [CustomJWTAuthentication]
+
     def post(self, request, pk):
-        event=get_object_or_404(Events, id=pk)
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
         if event.registration_count < request.data['present_count']:
             return Response(
-                {'error': "Attendance count is greater than registered attendees"},
+                {
+                    'error':
+                    "Attendance count is greater than registered attendees"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = OrganizerAttendanceSerializer(event, data=request.data, partial=True)
+        serializer = OrganizerAttendanceSerializer(
+            event,
+            data=request.data,
+            partial=True
+            )
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+                )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class UploadMediaFilesView(APIView):
@@ -183,14 +229,24 @@ class UploadMediaFilesView(APIView):
 
     def post(self, request, pk):
         event = get_object_or_404(Events, id=pk)
-        self.check_object_permissions(request,event)
+        self.check_object_permissions(request, event)
 
-        serializer = EventMediaFilesSerializer(event, data=request.data, partial=True)
+        serializer = EventMediaFilesSerializer(
+            event,
+            data=request.data,
+            partial=True
+            )
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.data,
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class RegisteredAttendeeView(APIView):
@@ -198,10 +254,11 @@ class RegisteredAttendeeView(APIView):
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request, pk):
-        event=get_object_or_404(Events, id=pk)
+        event = get_object_or_404(Events, id=pk)
         self.check_object_permissions(request, event)
         attendees_events = AttendeeEvent.objects.filter(event=event)
-        attendees = [attendee_event.Attendee for attendee_event in attendees_events]
+        attendees = [attendee_event.Attendee
+                     for attendee_event in attendees_events]
         serializer = GetAttendeeSerializer(attendees, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

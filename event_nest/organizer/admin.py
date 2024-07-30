@@ -2,15 +2,22 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
-from .models import EventNestUsers,Events
+from .models import EventNestUsers, Events
+
 
 class EventNestUsersCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput
+        )
+    password2 = forms.CharField(
+        label='Password confirmation',
+        widget=forms.PasswordInput
+        )
 
     class Meta:
         model = EventNestUsers
-        fields = ('email','role','organization')
+        fields = ('email', 'role', 'organization')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -30,12 +37,22 @@ class EventNestUsersCreationForm(forms.ModelForm):
 
         return user
 
+
 class EventNestUsersChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = EventNestUsers
-        fields = ('name', 'email', 'password','organization', 'role', 'is_active', 'is_staff')
+        fields = (
+            'name',
+            'email',
+            'password',
+            'organization',
+            'role',
+            'is_active',
+            'is_staff'
+            )
+
 
 class EventNestUsersAdmin(BaseUserAdmin):
     form = EventNestUsersChangeForm
@@ -45,7 +62,7 @@ class EventNestUsersAdmin(BaseUserAdmin):
     list_filter = ('is_staff', 'is_active', 'role')
     fieldsets = (
         (None, {
-                'fields': ('name','email', 'password','organization','role')
+                'fields': ('name', 'email', 'password', 'organization', 'role')
             }),
         ('Permissions', {
              'fields': ('is_staff', 'is_active')
@@ -54,12 +71,19 @@ class EventNestUsersAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'password1', 'password2','organization','role')
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'organization',
+                'role'
+                )
         }),
     )
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
+
 
 admin.site.register(EventNestUsers, EventNestUsersAdmin)
 admin.site.register(Events)
