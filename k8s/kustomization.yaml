@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+secretGenerator:
+  - name: django
+    literals:
+      - secret=mysecretishardtodecode
+  - name: postgres-secret
+    literals:
+    - POSTGRES_DB=event_nest
+    - POSTGRES_USER=admin
+    - POSTGRES_PASSWORD=admin
+    - POSTGRES_HOST=django-postgres
+    - POSTGRES_PORT=5432
+resources:  
+- postgres.yaml
+- django.yaml
