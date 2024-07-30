@@ -1,0 +1,2 @@
+[flake8]
+exclude = .git,__pycache__,migrations,__init__.py,settings.py,manage.py,.env
