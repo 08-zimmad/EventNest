@@ -6,6 +6,9 @@ COPY ./requirements.dev.txt /temp/requirements.dev.txt
 COPY ./requirements.txt /temp/requirements.txt
 COPY ./event_nest app/event_nest
 
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 WORKDIR /app/event_nest/event_nest
 EXPOSE 8000
 
