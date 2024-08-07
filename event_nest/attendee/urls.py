@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include, re_path
 from authentication.auth_serializers import (
     CustomTokenObtainPairSerializer,
     CustomTokenRefreshSerializer
@@ -16,7 +16,7 @@ from .views import (
     GiveRating,
     AttendeeRegistrationView
     )
-
+from authentication.views import login_attendee
 
 urlpatterns = [
     # attendee routes
@@ -24,7 +24,6 @@ urlpatterns = [
          AttendeeRegistrationView.as_view(),
          name="attendee-signup-view"
          ),
-    # path('api/', EventView.as_view(), name="events-view"),
     path('api/<int:pk>/',
          EventView.as_view(),
          name="events-attendee-registration"
@@ -55,4 +54,9 @@ urlpatterns = [
              ),
          name='token_refresh'
          ),
+     
+     #  oauth2
+    path('social/', include('social_django.urls', namespace='social')),
+    re_path(r'^oauth2/', include('drf_social_oauth2.urls', namespace='drf')),
+    path('api/auth2/', login_attendee),
 ]
