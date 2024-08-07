@@ -4,7 +4,6 @@ from django.db.transaction import TransactionManagementError
 from django.core.validators import MaxValueValidator
 from .manager import EventNestUserManager
 
-
 class EventNestUsers(AbstractBaseUser):
 
     ROLES = [
@@ -14,10 +13,11 @@ class EventNestUsers(AbstractBaseUser):
     name = models.CharField(max_length=40)
     email = models.EmailField(unique=True)
     organization = models.CharField(max_length=40, unique=True, null=True)
-    role = models.CharField(max_length=20, choices=ROLES)
+    role = models.CharField(max_length=20, choices=ROLES, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    is_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

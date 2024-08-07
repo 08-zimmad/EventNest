@@ -1,5 +1,3 @@
-from authentication.auth_serializers import CustomTokenRefreshSerializer
-from authentication.auth_serializers import CustomTokenObtainPairSerializer
 from authentication.views import login_organizer
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -17,14 +15,14 @@ from .views import (
 
 urlpatterns = [
     #  JWT
-    path('api/token/', TokenObtainPairView.as_view(
-        serializer_class=CustomTokenObtainPairSerializer
-        ),
-         name='token_obtain_pair'),
-    path('api/token/refresh', TokenRefreshView.as_view(
-        serializer_class=CustomTokenRefreshSerializer
-        ),
-        name='token_refresh'),
+    path('api/login/',
+         TokenObtainPairView.as_view(),
+         name='token_obtain_pair'
+         ),
+    path('api/login/refresh/',
+         TokenRefreshView.as_view(),
+         name='token_refresh'
+         ),
 
     #  Organizer
     path('api/register/',
@@ -55,6 +53,5 @@ urlpatterns = [
     #  oauth2
     path('social/', include('social_django.urls', namespace='social')),
     re_path(r'^oauth2/', include('drf_social_oauth2.urls', namespace='drf')),
-    #  path('google-login/', google_login, name='google_login')
     path('api/auth2/', login_organizer),
 ]
