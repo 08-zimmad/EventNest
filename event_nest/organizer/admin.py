@@ -44,7 +44,7 @@ class EventNestUsersChangeForm(forms.ModelForm):
     class Meta:
         model = EventNestUsers
         fields = (
-            'name',
+            'username',
             'email',
             'password',
             'organization',
@@ -58,11 +58,11 @@ class EventNestUsersAdmin(BaseUserAdmin):
     form = EventNestUsersChangeForm
     add_form = EventNestUsersCreationForm
 
-    list_display = ('name', 'email', 'is_staff', 'is_active', 'role')
+    list_display = ('username', 'email', 'is_staff', 'is_active', 'role')
     list_filter = ('is_staff', 'is_active', 'role')
     fieldsets = (
         (None, {
-                'fields': ('name', 'email', 'password', 'organization', 'role')
+                'fields': ('username', 'email', 'password', 'organization', 'role')
             }),
         ('Permissions', {
              'fields': ('is_staff', 'is_active')

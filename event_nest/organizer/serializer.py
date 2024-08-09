@@ -10,7 +10,13 @@ class EventNestUserSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = EventNestUsers
-        fields = ['name', 'email', 'password', 'organization', 'role']
+        fields = [
+            'username',
+            'email',
+            'password',
+            'organization',
+            'role'
+            ]
         extra_kwargs = {
             'password': {'write_only': True},
             'is_active': {'read_only': True},
@@ -19,10 +25,10 @@ class EventNestUserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if (
-            'name' in attrs and
-            not isinstance(attrs["name"], str)
+            'username' in attrs and
+            not isinstance(attrs["username"], str)
         ):
-            raise serializers.ValidationError("Name should not be integers")
+            raise serializers.ValidationError("Username should not be integers")
 
         if 'email' in attrs:
             if not attrs['email']:
@@ -114,7 +120,7 @@ class OrganizerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventNestUsers
-        fields = ['name', 'email', "organization"]
+        fields = ['username', 'email', "organization"]
 
 
 class OrganizerAttendanceSerializer(serializers.ModelSerializer):
@@ -142,4 +148,4 @@ class GetAttendeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventNestUsers
-        fields = ['email', 'name']
+        fields = ['email', 'username']

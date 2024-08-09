@@ -1,4 +1,3 @@
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from authentication.permissions import AttendeePermission
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -8,15 +7,13 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import AttendeeEvent, EmailTemplate
-from .serializers import (
-    AttendeeProfileSerializer,
-    AttendeeRegisterToEventSerializer,
-    GetEventSerializer,
-    RatingSerializer
-    )
+from .serializers import (AttendeeProfileSerializer,
+                          AttendeeRegisterToEventSerializer,
+                          GetEventSerializer, RatingSerializer)
 from .utils.email import send_email_to_attendee
 
 

@@ -10,7 +10,7 @@ class EventNestUsers(AbstractBaseUser):
         ("attendee", "Attendee"),
         ("organizer", "Organizer")]
 
-    name = models.CharField(max_length=40)
+    username = models.CharField(max_length=40)
     email = models.EmailField(unique=True)
     organization = models.CharField(max_length=40, unique=True, null=True)
     role = models.CharField(max_length=20, choices=ROLES, null=True)

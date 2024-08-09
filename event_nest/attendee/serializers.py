@@ -30,11 +30,11 @@ class AttendeeProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventNestUsers
-        fields = ['name', 'email']
+        fields = ['username', 'email']
 
     def validate(self, attrs):
-        if 'name' in attrs:
-            if not isinstance(attrs['name'], str):
+        if 'username' in attrs:
+            if not isinstance(attrs['username'], str):
                 raise serializers.ValidationError("Name should not numbers")
 
         if 'email' in attrs:

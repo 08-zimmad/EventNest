@@ -40,10 +40,11 @@ INSTALLED_APPS = [
      'rest_framework_simplejwt',
      #drf
       'rest_framework',
-      #Oauth
-      'oauth2_provider',
-      'social_django',
-      'drf_social_oauth2',
+     # oauth2
+     'allauth',
+     'allauth.account',
+     'allauth.socialaccount',
+     'allauth.socialaccount.providers.google',
       # API documentation-swagger
       'drf_spectacular',
       # Coverage
@@ -61,8 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # oauth2
-    'social_django.middleware.SocialAuthExceptionMiddleware',
+    # oauth
+     'allauth.account.middleware.AccountMiddleware',
 
 ]
 INTERNAL_IPS = [
@@ -82,8 +83,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 #oauth2
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -162,7 +161,8 @@ REST_FRAMEWORK = {
         #JWT
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # Oauth
-        'drf_social_oauth2.authentication.SocialAuthentication'
+        'allauth.account.auth_backends.AuthenticationBackend',
+
     ),
     # Spectacular-swagger
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -178,38 +178,12 @@ SIMPLE_JWT = {
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', 
     # Oauth2 google backends
-    'social_core.backends.google.GoogleOAuth2',
 ]
 
-# Oauth2 settings
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
-SOCIAL_AUTH_PIPELINE = (
-    'social_core.pipeline.social_auth.social_details',
-    'social_core.pipeline.social_auth.social_uid',
-    'social_core.pipeline.social_auth.auth_allowed',
-    'authentication.social_pipelines.social_user',
-    'social_core.pipeline.user.get_username',
-    'authentication.social_pipelines.create_user',
-    'social_core.pipeline.social_auth.associate_user',
-    'social_core.pipeline.social_auth.load_extra_data',
-    'social_core.pipeline.user.user_details',
-)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-]
-REST_SOCIAL_OAUTH2_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'organizer.serializer.EventNestUserSerializer',
-}
-LOGIN_REDIRECT_URL='/'
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+
 
 # auth user models and auth social model
 AUTH_USER_MODEL = 'organizer.EventNestUsers'
-SOCIAL_AUTH_USER_MODEL = 'organizer.EventNestUsers'
 
 # email settings
 EMAIL_BACKEND = os.environ['EMAIL_BACKEND']
@@ -237,6 +211,22 @@ SPECTACULAR_SETTINGS = {
             'type': 'apiKey',
             'in':'header',
             'name': 'Authorization',
+        }
+    }
+}
+
+
+# oauth2
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google':{
+        'SCOPE':[
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS':{
+            'access_type': 'online'
         }
     }
 }

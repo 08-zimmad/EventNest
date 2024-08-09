@@ -1,4 +1,3 @@
-from authentication.views import login_organizer
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView
@@ -11,7 +10,6 @@ from .views import (
     UploadMediaFilesView, GetEventView,
     RegisteredAttendeeView,
 )
-
 
 urlpatterns = [
     #  JWT
@@ -50,8 +48,6 @@ urlpatterns = [
          RegisteredAttendeeView.as_view(),
          name="registered-attendee-view"),
 
-    #  oauth2
-    path('social/', include('social_django.urls', namespace='social')),
-    re_path(r'^oauth2/', include('drf_social_oauth2.urls', namespace='drf')),
-    path('api/auth2/', login_organizer),
+
+#     path('api/auth2/', login_organizer),
 ]

@@ -16,7 +16,7 @@ from .views import (
     GiveRating,
     AttendeeRegistrationView
     )
-from authentication.views import login_attendee
+# from authentication.views import login_attendee
 
 urlpatterns = [
     # attendee routes
@@ -54,9 +54,7 @@ urlpatterns = [
              ),
          name='token_refresh'
          ),
-     
+
      #  oauth2
-    path('social/', include('social_django.urls', namespace='social')),
-    re_path(r'^oauth2/', include('drf_social_oauth2.urls', namespace='drf')),
-    path('api/auth2/', login_attendee),
+    # path('api/auth2/', login_attendee),
 ]
