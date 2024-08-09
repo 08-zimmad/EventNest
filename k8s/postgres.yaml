@@ -52,7 +52,7 @@ spec:
           persistentVolumeClaim:
             claimName: django-postgres-pvc
       containers:
-      - image: zimmadwaraich/postgres:13
+      - image: zimmadwaraich/event_nest:postgres
         name: postgres
         ports:
         - containerPort: 5432

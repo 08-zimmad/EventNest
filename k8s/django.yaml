@@ -55,7 +55,7 @@ spec:
         persistentVolumeClaim:
           claimName: django-app-pvc
       containers:
-      - image: zimmadwaraich/app:event_nest
+      - image: zimmadwaraich/event_nest:event_nest
         command: ["python", "/app/event_nest/manage.py", "runserver", "0.0.0.0:8000"]
         name: app
         volumeMounts:
