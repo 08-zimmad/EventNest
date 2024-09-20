@@ -14,8 +14,8 @@ Multion-browser is an innovative web surfing tool that allows users to see live 
 2. create the virtual Environment: `py -m venv .venv`
 ### For Debians/Ubuntu
 
-`sudo apt update`
-`sudo apt install python3-venv`
+```sudo apt update
+   sudo apt install python3-venv```
 
 3. Install dependencies: `pip install -r apps/requirements.txt`
 4. Install npm packages `npm install`
