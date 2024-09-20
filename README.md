@@ -10,15 +10,26 @@ Multion-browser is an innovative web surfing tool that allows users to see live 
 
 ## Installation
 
-1. Clone the repo: `https://github.com/wshah21/multion-browser.git`
-2. create the virtual Environment: `py -m venv .venv`
+1. Clone the repo:
+```
+https://github.com/wshah21/multion-browser.git
+```
+3. create the virtual Environment:
 ### For Debians/Ubuntu
 
-```sudo apt update
-   sudo apt install python3-venv```
+Install the venv package:
+```
+sudo apt update
+sudo apt install python3-venv
+py -m venv .venv
+```
 
-3. Install dependencies: `pip install -r apps/requirements.txt`
-4. Install npm packages `npm install`
+3. Install dependencies and npm packages:
+
+```
+pip install -r apps/requirements.txt
+npm install
+```
 
 ## Usage
 
